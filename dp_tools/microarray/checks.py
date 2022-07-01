@@ -2,16 +2,6 @@ from pathlib import Path
 from dp_tools.core.check_model import FlagCode, FlagEntry
 import os
 
-def check_file_exists(file: Path) -> FlagEntry:
-    # check logic
-    if file.is_file():
-        code = FlagCode.GREEN
-        message = f"File exists: {file.name} "
-    else:
-        code = FlagCode.HALT
-        message = f"Missing file: {file.name} expected at {str(file)} "
-    return {"code": code, "message": message}
-
 def check_if_valid_extensions(file: Path, valid_extensions: tuple[str]) -> FlagEntry:
     """ This function looks at the extension of the file and
         tells whether it is a valid extension or not.
