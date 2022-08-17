@@ -1,6 +1,7 @@
 from pathlib import Path
 from dp_tools.core.check_model import FlagCode, FlagEntry
 import os
+import pandas as pd
 
 def check_if_valid_extensions(file: Path, valid_extensions: tuple[str]) -> FlagEntry:
     """ This function looks at the extension of the file and
@@ -40,4 +41,51 @@ def check_file_size(file: Path) -> FlagEntry:
     return {"code": code, "message": message}
 
 
+def check_if_file_exists(file: Path) -> FlagEntry:
+    """ This function checks the output file to make sure that
+    the files were generated.
+
+    :param path_to_file: Absolute path to the file (including filename)
+    :type path_to_file: Path
+    :param valid_ext: File extensions to check for
+    :type valid_ext: tuple[str]
+    :return: A required fields-only flag entry dictionary
+    :rtype: FlagEntry
+    """    
     
+    if file.is_file():
+        code = FlagCode.GREEN
+        message = f"The file exists!: {file.name}"
+    else:
+        code = FlagCode.HALT
+        message = f"The file does not exist: {file.name}"
+    return {"code": code, "message": message}
+
+
+def check_colnames(file: Path, colnames: list[str]) -> FlagEntry:
+    """A function that checks the output CSV file to make sure it contains the 
+    correct columns.
+
+    :param file: Absolute path to the file
+    :type file: Path
+    :param colnames: List of the column names to check for in the CSV file
+    :type colnames: list[str]
+    :return: A required fields-only flag entry dictionary
+    :rtype: FlagEntry
+    """    """"""
+    code_list = [] # Will store the codes after each iteration
+    message_list = [] # Will store the messages after each iteration
+    file = pd.read_csv(file)
+    header = file.columns.values.tolist() # Putting the column names into a list(file.columns)
+    for name in colnames:
+        if name in header:
+            code = FlagCode.GREEN
+            message = f"The column exists!: {name}"
+            code_list.append(code)
+            message_list.append(message)
+        else:
+            code = FlagCode.HALT
+            message = f"The column does not exist!: {name}"
+            code_list.append(code)
+            message_list.append(message)
+    return {"code": code_list, "message": message_list} 
